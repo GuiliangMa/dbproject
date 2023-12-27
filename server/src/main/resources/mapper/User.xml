@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mgl.server.mapper.UserMapper">
+    <!--    id与对应文件下的方法相同-->
+    <update id="update">
+        update sys_user
+        <set>
+            <if test="username!=null">
+                username = #{username},
+            </if>
+            <!--            <if test="password!=null">-->
+            <!--                username = #{username}-->
+            <!--            </if>-->
+            <if test="status!=null">
+                status=#{status},
+            </if>
+            <if test="nickname!=null">
+                nickname=#{nickname},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="phone!=null">
+                phone=#{phone}
+            </if>
+        </set>
+        <where>
+            username = #{username}
+        </where>
+    </update>
+
+    <select id="searchPage">
+        select *
+        from sys_user
+        <where>
+            <if test="username!=''">
+                username like concat('%',#{username},'%')
+            </if>
+            <if test="email!=''">
+                and email like concat('%',#{email},'%')
+            </if>
+            <if test="phone!=''">
+                and phone like concat('%',#{phone},'%')
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        limit #{pageNum},#{pageSize}
+    </select>
+
+    <select id="countTotal">
+        SELECT COUNT(*)
+        FROM sys_user
+        <where>
+            <if test="username!=''">
+                username like concat('%',#{username},'%')
+            </if>
+            <if test="email!=''">
+                and email like concat('%',#{email},'%')
+            </if>
+            <if test="phone!=''">
+                and phone like concat('%',#{phone},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="findAll">
+        select *
+        from sys_user
+        <where>
+            <if test="username!=''">
+                username like concat('%',#{username},'%')
+            </if>
+            <if test="email!=''">
+                and email like concat('%',#{email},'%')
+            </if>
+            <if test="phone!=''">
+                and phone like concat('%',#{phone},'%')
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+</mapper>

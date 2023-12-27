@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mgl.server.mapper.ClassroomMapper">
+    <select id="findPage">
+        select *
+        from classroom
+        <where>
+            capacity >= #{capacity}
+            <if test="multiMedia!=2">
+                and multimedia=#{multiMedia}
+            </if>
+            <if test="AC!=2">
+                and AC=#{AC}
+            </if>
+
+            <if test="roomName!=''">
+                and roomname like concat('%',#{roomName},'%')
+            </if>
+            <if test="type!=''">
+                and type like concat('%',#{type},'%')
+            </if>
+        </where>
+        ORDER BY rid DESC
+        limit #{pageNum},#{pageSize}
+    </select>
+
+    <select id="countTotal">
+        SELECT COUNT(*)
+        FROM classroom
+        <where>
+            capacity >= #{capacity}
+            <if test="multiMedia!=2">
+                and multimedia=#{multiMedia}
+            </if>
+            <if test="AC!=2">
+                and AC=#{AC}
+            </if>
+
+            <if test="roomName!=''">
+                and roomname like concat('%',#{roomName},'%')
+            </if>
+            <if test="type!=''">
+                and type like concat('%',#{type},'%')
+            </if>
+        </where>
+    </select>
+
+    <update id="update">
+        update classroom
+        <set>
+            multimedia = #{multiMedia},
+            AC = #{AC},
+            part = #{part},
+            type = #{type},
+            location =#{location},
+            available = #{available}
+            <if test="roomName!=''">
+                ,roomname = #{roomName}
+            </if>
+            <if test="capacity!=0">
+                ,capacity = #{capacity}
+            </if>
+        </set>
+        where rid = #{rid}
+    </update>
+</mapper>

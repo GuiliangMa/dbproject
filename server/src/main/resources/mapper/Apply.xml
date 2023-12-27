@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mgl.server.mapper.ApplyMapper">
+    <select id="findFreePage">
+        select *
+        from classroom
+        <where>
+            rid not in
+            (select rid
+            from utilization
+            where endTime > #{startTime} and #{endTime} > startTime) and
+            capacity >= #{capacity}
+            <if test="multiMedia!=2">
+                and multimedia=#{multiMedia}
+            </if>
+            <if test="AC!=2">
+                and AC=#{AC}
+            </if>
+            <if test="roomName!=''">
+                and roomname like concat('%',#{roomName},'%')
+            </if>
+            <if test="type!=''">
+                and type like concat('%',#{type},'%')
+            </if>
+        </where>
+        limit #{pageNum},#{pageSize}
+    </select>
+
+    <select id="totalFree">
+        select count(*)
+        from classroom
+        <where>
+            rid not in
+            (select rid
+            from utilization
+            where endTime > #{startTime} and #{endTime} > startTime) and
+            capacity >= #{capacity}
+            <if test="multiMedia!=2">
+                and multimedia=#{multiMedia}
+            </if>
+            <if test="AC!=2">
+                and AC=#{AC}
+            </if>
+
+            <if test="roomName!=''">
+                and roomname like concat('%',#{roomName},'%')
+            </if>
+            <if test="type!=''">
+                and type like concat('%',#{type},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getIdAndName">
+        select id,name
+        from(
+            (select sid as id, name,username
+             from student) union
+            (select tid as id,name,username
+            from teacher) union
+            (select aid as id,name,username
+            from admin)) as userId
+        where username = #{username}
+    </select>
+
+    <select id="findPage">
+        select
+        apid,rid,roomname,username,name,status,startTime,endTime,remark,mode,msg
+        from
+        (select apid,rid,roomname, username, status, startTime, endTime, remark,mode,msg
+        from sys_user natural join classroom natural join apply
+        ) as msg natural join
+        (
+            (select name,username
+             from student ) union
+            (select name, username
+             from teacher ) union
+            (select name,username
+             from admin)
+        ) as user
+        <where>
+            endTime > #{startTime} and #{endTime} > startTime
+            <if test="name!=''"> and name like concat('%',#{name},'%') </if>
+            <if test="roomName!=''"> and roomname like concat('%',#{roomName},'%')</if>
+            <if test="status!=''"> and status = #{status}</if>
+            <if test="mode!=''"> and mode = #{mode}</if>
+        </where>
+        order by startTime desc
+        limit #{pageNum},#{pageSize}
+    </select>
+
+    <select id="countTotal">
+        select
+        count(*)
+        from
+        (select apid,rid,roomname, username, status, startTime, endTime, remark,mode,msg
+        from sys_user natural join classroom natural join apply
+        ) as msg natural join
+        (
+        (select name,username
+        from student ) union
+        (select name, username
+        from teacher ) union
+        (select name,username
+        from admin)
+        ) as user
+        <where>
+            endTime > #{startTime} and #{endTime} > startTime
+            <if test="name!=''"> and name like concat('%',#{name},'%') </if>
+            <if test="roomName!=''"> and roomname like concat('%',#{roomName},'%')</if>
+            <if test="status!=''"> and status = #{status}</if>
+            <if test="mode!=''"> and mode = #{mode}</if>
+        </where>
+    </select>
+
+    <update id="modify">
+        update apply
+        set mode = '已拒绝',msg = '该时段此教室被其他人占用'
+        where mode = '待批准' and endTime > #{startTime} and #{endTime} > startTime
+    </update>
+
+    <select id="findMyPage">
+        select
+        apid,rid,roomname,username,name,status,startTime,endTime,remark,mode,msg
+        from
+        (select apid,rid,roomname, username, status, startTime, endTime, remark,mode,msg
+        from sys_user natural join classroom natural join apply
+        ) as msg natural join
+        (
+        (select name,username
+        from student ) union
+        (select name, username
+        from teacher ) union
+        (select name,username
+        from admin)
+        ) as user
+        <where>
+            endTime > #{startTime} and #{endTime} > startTime
+            and username = #{username}
+            <if test="roomName!=''"> and roomname like concat('%',#{roomName},'%')</if>
+            <if test="mode!=''"> and mode = #{mode}</if>
+        </where>
+        order by startTime desc
+        limit #{pageNum},#{pageSize}
+    </select>
+
+    <select id="countMyTotal">
+        select
+        count(*)
+        from
+        (select apid,rid,roomname, username, status, startTime, endTime, remark,mode,msg
+        from sys_user natural join classroom natural join apply
+        ) as msg natural join
+        (
+        (select name,username
+        from student ) union
+        (select name, username
+        from teacher ) union
+        (select name,username
+        from admin)
+        ) as user
+        <where>
+            endTime > #{startTime} and #{endTime} > startTime
+            and username = #{username}
+            <if test="roomName!=''"> and roomname like concat('%',#{roomName},'%')</if>
+            <if test="mode!=''"> and mode = #{mode}</if>
+        </where>
+    </select>
+</mapper>

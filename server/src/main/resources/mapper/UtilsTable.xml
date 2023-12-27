@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mgl.server.mapper.UtilsTableMapper">
+    <select id="findPage">
+        select
+        uid,roomname,name,status,startTime,endTime,remark,props
+        from
+        (select uid, roomname, username, status, startTime, endTime, remark,props
+        from sys_user natural join classroom natural join utilization
+        order by starttime
+        ) as msg natural join
+        (
+        (select name,username
+        from student ) union
+        (select name, username
+        from teacher ) union
+        (select name,username
+        from admin)
+        ) as user
+        <where>
+            endTime > #{startTime} and #{endTime} > startTime
+            <if test="name!=''"> and name like concat('%',#{name},'%') </if>
+            <if test="roomName!=''"> and roomname like concat('%',#{roomName},'%')</if>
+            <if test="status!=''"> and status = #{status}</if>
+            <if test="state=='已使用' "> and #{now}>endTime </if>
+            <if test="state=='在使用'"> and #{now}>=startTime and endTime>=#{now}</if>
+            <if test="state=='待使用'"> and startTime>#{now}</if>
+        </where>
+        order by startTime desc
+        limit #{pageNum},#{pageSize}
+    </select>
+
+    <select id="countTotal">
+        select count(*)
+        from
+        (select uid, roomname, username, status, startTime, endTime, remark,props
+        from sys_user natural join classroom natural join utilization
+        order by starttime
+        ) as msg natural join
+        (
+        (select name,username
+        from student ) union
+        (select name, username
+        from teacher ) union
+        (select name,username
+        from admin)
+        ) as user
+        <where>
+            endTime > #{startTime} and #{endTime} > startTime
+            <if test="name!=''">and name like concat('%',#{name},'%')</if>
+            <if test="roomName!=''">and roomname like concat('%',#{roomName},'%')</if>
+            <if test="status!=''">and status = #{status}</if>
+            <if test="state=='已使用' "> and #{now}>endTime </if>
+            <if test="state=='在使用'"> and #{now}>=startTime and endTime>=#{now}</if>
+            <if test="state=='待使用'"> and startTime>#{now}</if>
+        </where>
+    </select>
+
+    <select id="list">
+        select
+            uid,roomname,name,status,startTime,endTime,remark,props
+        from
+            (select uid, roomname, username, status, startTime, endTime, remark,props
+             from sys_user natural join classroom natural join utilization
+             order by starttime
+            ) as msg natural join
+            (
+                (select name,username
+                 from student ) union
+                (select name, username
+                 from teacher ) union
+                (select name,username
+                 from admin)
+            ) as user
+    </select>
+
+    <select id="findMyPage">
+        select
+        uid,roomname,name,status,startTime,endTime,remark,props
+        from
+        (select uid, roomname, username, status, startTime, endTime, remark,props
+        from sys_user natural join classroom natural join utilization
+        order by starttime
+        ) as msg natural join
+        (
+        (select name,username
+        from student ) union
+        (select name, username
+        from teacher ) union
+        (select name,username
+        from admin)
+        ) as user
+        <where>
+            endTime > #{startTime} and #{endTime} > startTime
+            and username=#{username}
+            <if test="roomName!=''"> and roomname like concat('%',#{roomName},'%')</if>
+            <if test="state=='已使用' "> and #{now}>endTime </if>
+            <if test="state=='在使用'"> and #{now}>=startTime and endTime>=#{now}</if>
+            <if test="state=='待使用'"> and startTime>#{now}</if>
+        </where>
+        order by startTime desc
+        limit #{pageNum},#{pageSize}
+    </select>
+
+    <select id="countMyTotal">
+        select
+        count(*)
+        from
+        (select uid, roomname, username, status, startTime, endTime, remark,props
+        from sys_user natural join classroom natural join utilization
+        order by starttime
+        ) as msg natural join
+        (
+        (select name,username
+        from student ) union
+        (select name, username
+        from teacher ) union
+        (select name,username
+        from admin)
+        ) as user
+        <where>
+            endTime > #{startTime} and #{endTime} > startTime
+            and username=#{username}
+            <if test="roomName!=''"> and roomname like concat('%',#{roomName},'%')</if>
+            <if test="state=='已使用' "> and #{now}>endTime </if>
+            <if test="state=='在使用'"> and #{now}>=startTime and endTime>=#{now}</if>
+            <if test="state=='待使用'"> and startTime>#{now}</if>
+        </where>
+    </select>
+</mapper>
